@@ -23,6 +23,7 @@ struct ContentView: View {
                     Label("Account", systemImage: "person.circle")
                 }
         }
+        .preferredColorScheme(.dark)
     }
 }
 
