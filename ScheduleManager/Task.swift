@@ -11,6 +11,7 @@ struct Task: Hashable {
     var name: String;
     var start_time: String;
     var end_time: String;
+    var recurring: String;
     var weather: String;
     var tags: [Tag];
 }
