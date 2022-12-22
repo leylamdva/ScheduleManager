@@ -174,7 +174,8 @@ struct FieldBackgroundView : ViewModifier {
             .padding(.horizontal, 20)
             .frame(height: 50)
             .frame(maxWidth: .infinity)
-            .background(RoundedRectangle(cornerRadius: 15).fill(fieldColor))
+            .background(fieldColor)
+            .clipShape(RoundedRectangle(cornerRadius: 15))
             .padding(.vertical, 10)
     }
 }
