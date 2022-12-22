@@ -12,7 +12,7 @@ struct LoginView: View {
     
     @StateObject var user: User = User()
     @Binding var authenticated: Bool
-    //@Binding var userData: Data
+    @Binding var userData: Data
     
     var body: some View {
         NavigationView{
@@ -70,7 +70,7 @@ struct LoginView: View {
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView(authenticated: .constant(false))
+        LoginView(authenticated: .constant(false), userData: .constant(Data()))
             .preferredColorScheme(.dark)
     }
 }

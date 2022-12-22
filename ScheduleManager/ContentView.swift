@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct ContentView: View {
+    @ObservedObject var user: User
+    @Binding var isAuthenticated: Bool
+    
     var body: some View {
         TabView{
             HomeView()
@@ -29,7 +32,7 @@ struct ContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        ContentView(user: User(), isAuthenticated: .constant(true))
             .preferredColorScheme(.dark)
     }
 }
