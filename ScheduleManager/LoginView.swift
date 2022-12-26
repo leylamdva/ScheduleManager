@@ -53,7 +53,7 @@ struct LoginView: View {
                 }
                 
                 // Create account
-                NavigationLink(destination: Text("Create Account")){
+                NavigationLink(destination: CreateAccount()){
                     Text("or Create an Account")
                         .foregroundColor(.blue)
                         .underline()

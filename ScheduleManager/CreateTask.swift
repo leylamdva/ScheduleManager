@@ -20,6 +20,7 @@ struct CreateTask: View {
     @State var repeatTime = "Never"
     @State var selectedDays = [false, false, false, false, false, false, false]
     @State var selectedWeather = "None"
+    @State var task = Task(name: "", start_time: "", end_time: "", recurring: "", weather: "", tags: [])
     
     var body: some View {
         NavigationView{
@@ -108,7 +109,7 @@ struct CreateTask: View {
                 } // VStack repeat
                 
                 // Tags
-                NavigationLink(destination: Text("Task Creation"), label: {
+                NavigationLink(destination: CreateTagsView(task: task), label: {
                     HStack {
                         Text("Tags")
                             .modifier(MenuText())
@@ -139,6 +140,7 @@ struct CreateTask: View {
             } //VStack
             .navigationBarTitle(Text("Create a Task"))
             .navigationBarTitleDisplayMode(.inline)
+            .navigationBarBackButtonHidden(true)
             
             // TODO: Custom Cancel and Done button
             .navigationBarItems(leading: Text("Cancel"), trailing: Text("Done"))
