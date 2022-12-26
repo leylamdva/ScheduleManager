@@ -28,7 +28,7 @@ struct LoginView: View {
                         .modifier(InputField(fieldColor: fieldColor))
                     .keyboardType(.default)
                     
-                    NavigationLink(destination: Text("Forgot Password")){
+                    NavigationLink(destination: ForgotPassword(email: user.email)){
                         Text("Forgot password?")
                             .padding(.horizontal, 10)
                             .foregroundColor(.white)
@@ -37,7 +37,7 @@ struct LoginView: View {
                 }
                 
                 // Login button
-                NavigationLink(destination: ContentView(), isActive: $authenticated){
+                NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated){
                     Button(action: {
                        // TODO: Implement login
                     }){
