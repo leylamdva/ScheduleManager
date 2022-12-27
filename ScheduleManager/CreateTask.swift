@@ -46,6 +46,7 @@ struct CreateTask: View {
                             Text("Start Time")
                                 .modifier(MenuText())
                             DatePicker("", selection: $startDate)
+                            // TODO: change time selection to store in database
                         } else{
                             DisabledOptionView(title: "Start Time")
                         }

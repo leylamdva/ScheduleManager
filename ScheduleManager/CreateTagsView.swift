@@ -23,7 +23,7 @@ struct CreateTagsView: View {
                     
                 } else {
                     ForEach(task.tags, id:\.self) {tag in
-                        TagRow(tag: tag, description: $description)
+                        TagRow(tag: tag)
                     }
                 }
                 
@@ -76,9 +76,9 @@ struct CreateTagsView: View {
 
 struct TagRow: View{
     var tag: Tag
-    @Binding var description: Bool
+    //@Binding var description: Bool
     //@Binding var selectedColor: Color
-
+    @State var description = false
     @State var tagColor = Color.blue
     @State var selectedColor = Color.yellow
     @State var tagName = ""
@@ -137,7 +137,7 @@ struct TagRow: View{
 
 struct CreateTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTagsView(task: Task(name: "Example", start_time: "", end_time: "", recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        CreateTagsView(task: Task(name: "Example", start_time: "", end_time: "", recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))]))
             .preferredColorScheme(.dark)
     }
 }
