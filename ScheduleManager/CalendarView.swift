@@ -10,8 +10,8 @@ import SwiftUI
 struct CalendarView: View {
     @State private var date = Date()
     @State private var tasks = [
-        Task(name: "Tennis", start_time: "09:00", end_time: "12:30", recurring: "true", weather: "sunny", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
-        Task(name: "Software Engineering Homework", start_time: "", end_time: "", recurring: "false", weather: "", tags: [Tag(name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
+        Task(name: "Tennis", start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
+        Task(name: "Software Engineering Homework", start_time: Date.now, end_time: Date.now, recurring: "false", weather: "", tags: [Tag(name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
     ]
     
     var body: some View {

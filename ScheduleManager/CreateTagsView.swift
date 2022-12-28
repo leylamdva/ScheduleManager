@@ -137,7 +137,7 @@ struct TagRow: View{
 
 struct CreateTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTagsView(task: Task(name: "Example", start_time: "", end_time: "", recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))]))
+        CreateTagsView(task: Task(name: "Example", start_time: Date.now, end_time: Date.now, recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))]))
             .preferredColorScheme(.dark)
     }
 }

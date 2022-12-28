@@ -20,7 +20,7 @@ struct CreateTask: View {
     @State var repeatTime = "Never"
     @State var selectedDays = [false, false, false, false, false, false, false]
     @State var selectedWeather = "None"
-    @State var task = Task(name: "", start_time: "", end_time: "", recurring: "", weather: "", tags: [])
+    @State var task = Task(name: "", start_time: Date.now, end_time: Date.now, recurring: "", weather: "", tags: [])
     
     var body: some View {
         NavigationView{
@@ -47,6 +47,7 @@ struct CreateTask: View {
                                 .modifier(MenuText())
                             DatePicker("", selection: $startDate)
                             // TODO: change time selection to store in database
+                            //Text(DateFormatter.times.string(from: startDate))
                         } else{
                             DisabledOptionView(title: "Start Time")
                         }
