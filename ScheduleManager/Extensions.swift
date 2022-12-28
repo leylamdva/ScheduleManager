@@ -30,3 +30,14 @@ extension Color {
         return (r, g, b, o)
     }
 }
+
+extension DateFormatter {
+    static let times : DateFormatter = {
+        let formatter = DateFormatter()
+        
+        formatter.dateFormat = "HH:mm"
+        
+        return formatter
+    }()
+    
+}
