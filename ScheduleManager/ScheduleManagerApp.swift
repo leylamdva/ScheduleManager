@@ -14,15 +14,16 @@ struct ScheduleManagerApp: App {
     
     var body: some Scene {
         WindowGroup {
-            if isAuthenticated{
-                if let user = try?JSONDecoder().decode(User.self, from: userData){
-                    ContentView(user: user, isAuthenticated: $isAuthenticated)
-                } else{
-                    // TODO: implement this
-                }
-            } else{
-                LoginView(authenticated: $isAuthenticated, userData: $userData)
-            }
+            HomeView(user: User())
+//            if isAuthenticated{
+//                if let user = try?JSONDecoder().decode(User.self, from: userData){
+//                    ContentView(user: user, isAuthenticated: $isAuthenticated)
+//                } else{
+//                    // TODO: implement this
+//                }
+//            } else{
+//                LoginView(authenticated: $isAuthenticated, userData: $userData)
+//            }
         }
     }
 }

@@ -30,7 +30,7 @@ struct CheckboxTaskRow: View {
                 }
                 Spacer()
                 // Weather icon
-                if task.weather != "" {
+                if task.weather != "None" {
                     WeatherIcon(weather: task.weather)
                 }
                 // Tags
@@ -75,7 +75,7 @@ struct WeatherIcon: View {
 
 struct TaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        CheckboxTaskRow(task: Task(name: "Tennis", start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        CheckboxTaskRow(task: Task(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
             .preferredColorScheme(.dark)
     }
 }

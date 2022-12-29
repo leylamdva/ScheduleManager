@@ -40,4 +40,49 @@ extension DateFormatter {
         return formatter
     }()
     
+    static let iso: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return formatter
+    }()
+    
+    static let day: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "dd MMMM"
+        return formatter
+    }()
+    
+}
+
+extension Date{
+    
+    var hour : Int {
+        let cal = Calendar.current
+        return cal.dateComponents([.hour], from: self).hour ?? 0
+    }
+    
+    func nearestHour() -> Date? {
+        var components = NSCalendar.current.dateComponents([.minute], from: self)
+        let minute = components.minute ?? 0
+        components.minute = minute >= 30 ? 60 - minute : -minute
+        return Calendar.current.date(byAdding: components, to: self)
+    }
+    
+    func roundUp() -> Date? {
+        var components = NSCalendar.current.dateComponents([.minute], from: self)
+        let minute = components.minute ?? 0
+        if minute != 0 {
+            components.minute =  60 - minute
+        }
+        return Calendar.current.date(byAdding: components, to: self)
+    }
+    
+    func roundDown() -> Date? {
+        var components = NSCalendar.current.dateComponents([.minute], from: self)
+        let minute = components.minute ?? 0
+        if minute != 0 {
+            components.minute = -minute
+        }
+        return Calendar.current.date(byAdding: components, to: self)
+    }
 }

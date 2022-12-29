@@ -9,6 +9,7 @@ import Foundation
 
 struct Task: Hashable {
     var name: String
+    var timeSensitive: Bool
     var start_time: Date
     var end_time: Date
     var recurring: String
