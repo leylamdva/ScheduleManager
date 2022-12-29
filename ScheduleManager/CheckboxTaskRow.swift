@@ -24,9 +24,11 @@ struct CheckboxTaskRow: View {
                 // Regular or crossed out text
                 if isCompleted{
                     Text(task.name)
+                        .font(.title3)
                         .strikethrough()
                 }else{
                     Text(task.name)
+                        .font(.title3)
                 }
                 Spacer()
                 // Weather icon
