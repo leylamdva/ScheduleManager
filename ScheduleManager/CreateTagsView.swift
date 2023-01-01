@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CreateTagsView: View {
-    var task: Task
+    var task: UserTask
     
     @State var description = false
     @State var addTag = false
@@ -137,7 +137,7 @@ struct TagRow: View{
 
 struct CreateTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTagsView(task: Task(name: "Example", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))]))
+        CreateTagsView(task: UserTask(name: "Example", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "no", weather: "none", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))]))
             .preferredColorScheme(.dark)
     }
 }

@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CheckboxTaskRow: View {
-    var task: Task
+    var task: UserTask
     @State var isCompleted: Bool = false
     var body: some View {
         VStack {
@@ -77,7 +77,7 @@ struct WeatherIcon: View {
 
 struct TaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        CheckboxTaskRow(task: Task(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        CheckboxTaskRow(task: UserTask(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
             .preferredColorScheme(.dark)
     }
 }

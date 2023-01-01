@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Task: Hashable {
+struct UserTask: Hashable {
     var name: String
     var timeSensitive: Bool
     var start_time: Date

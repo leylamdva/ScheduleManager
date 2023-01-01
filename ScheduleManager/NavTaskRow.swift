@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct NavTaskRow: View {
-    var task: Task
+    var task: UserTask
     var body: some View {
         HStack{
             //Name of task
@@ -41,7 +41,7 @@ struct NavTaskRow: View {
 
 struct NavTaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        NavTaskRow(task: Task(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        NavTaskRow(task: UserTask(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))]))
             .preferredColorScheme(.dark)
     }
 }

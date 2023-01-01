@@ -37,10 +37,6 @@ enum CodingKeys: CodingKey {
     case email, token, location
 }
 
-struct Status: Codable {
-    var status: String
-}
-
 struct Token : Codable {
     var token: String
 }

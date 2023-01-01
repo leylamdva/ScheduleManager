@@ -7,12 +7,17 @@
 
 import SwiftUI
 
+struct RequestBase {
+    var url: String = "https://schedules.azurewebsites.net"
+}
+
 struct LoginView: View {
     let fieldColor = Color(red: 0.168, green: 0.168, blue: 0.208)
     
     @StateObject var user: User = User()
     @Binding var authenticated: Bool
     @Binding var userData: Data
+    @State private var showAlert = false
     
     var body: some View {
         NavigationView{
@@ -39,7 +44,9 @@ struct LoginView: View {
                 // Login button
                 NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated){
                     Button(action: {
-                       // TODO: Implement login
+                        Task{
+                            await onLoginPressed()
+                        }
                     }){
                         Text("Login")
                             .font(.title3)
@@ -65,7 +72,45 @@ struct LoginView: View {
             }
             .navigationBarTitle("Login", displayMode: .inline)
         }
+        .alert("Error", isPresented: $showAlert){
+            Button("Close", role: .cancel){ }
+        } message: {
+            Text("Incorrect e-mail or password")
+        }
     }
+    
+    func onLoginPressed() async {
+            
+        let url = RequestBase().url + "/api/User/authenticate"
+        
+        var bodyObject : [String: Any] = [
+            "eMail" : user.email,
+            "password" : user.password
+        ]
+            var body = try! JSONSerialization.data(withJSONObject: bodyObject)
+            
+            let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body)
+            print(String(decoding: data, as: UTF8.self))
+            
+            do {
+                if status == 200{
+                    let decodedToken = try JSONDecoder().decode(Token.self, from: data)
+                    user.token = decodedToken.token
+                    authenticated = true
+                    
+                    // Save user data
+                    if let encodedData = try?JSONEncoder().encode(user){
+                        userData = encodedData
+                    }
+                    
+                }else{
+                    showAlert = true
+                }
+            } catch {
+                //print("Login failed")
+                print(error)
+            }
+        }
 }
 
 struct LoginView_Previews: PreviewProvider {

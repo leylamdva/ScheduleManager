@@ -20,7 +20,7 @@ struct CreateTask: View {
     @State var repeatTime = "Never"
     @State var selectedDays = [false, false, false, false, false, false, false]
     @State var selectedWeather = "None"
-    @State var task = Task(name: "", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "", weather: "", tags: [])
+    @State var task = UserTask(name: "", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "", weather: "", tags: [])
     
     var body: some View {
         NavigationView{

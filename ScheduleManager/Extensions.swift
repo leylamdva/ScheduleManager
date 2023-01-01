@@ -61,6 +61,16 @@ extension Date{
         return cal.dateComponents([.hour], from: self).hour ?? 0
     }
     
+    var day : Int {
+        let cal = Calendar.current
+        return cal.dateComponents([.day], from: self).day ?? 0
+    }
+    
+    var month : Int {
+        let cal = Calendar.current
+        return cal.dateComponents([.month], from: self).month ?? 0
+    }
+    
     func nearestHour() -> Date? {
         var components = NSCalendar.current.dateComponents([.minute], from: self)
         let minute = components.minute ?? 0
