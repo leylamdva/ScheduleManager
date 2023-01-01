@@ -60,7 +60,7 @@ struct LoginView: View {
                 }
                 
                 // Create account
-                NavigationLink(destination: CreateAccount()){
+                NavigationLink(destination: CreateAccount(authenticated: $authenticated, userData: $userData)){
                     Text("or Create an Account")
                         .foregroundColor(.blue)
                         .underline()
@@ -72,6 +72,7 @@ struct LoginView: View {
             }
             .navigationBarTitle("Login", displayMode: .inline)
         }
+        .padding(.horizontal, 15)
         .alert("Error", isPresented: $showAlert){
             Button("Close", role: .cancel){ }
         } message: {
@@ -83,11 +84,11 @@ struct LoginView: View {
             
         let url = RequestBase().url + "/api/User/authenticate"
         
-        var bodyObject : [String: Any] = [
+        let bodyObject : [String: Any] = [
             "eMail" : user.email,
             "password" : user.password
         ]
-            var body = try! JSONSerialization.data(withJSONObject: bodyObject)
+            let body = try! JSONSerialization.data(withJSONObject: bodyObject)
             
             let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body)
             print(String(decoding: data, as: UTF8.self))

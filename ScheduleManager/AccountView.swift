@@ -8,6 +8,9 @@
 import SwiftUI
 
 struct AccountView: View {
+    @ObservedObject var user: User
+    @Binding var isAuthenticated: Bool
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -72,6 +75,11 @@ struct AccountView: View {
                 // Log Out
                 Button{
                     // TODO: logout implementation
+                    user.email = ""
+                    user.password = ""
+                    user.token = ""
+                    user.location = ""
+                    isAuthenticated = false
                 }label: {
                     Text("Log Out")
                         .foregroundColor(.blue)
@@ -81,12 +89,14 @@ struct AccountView: View {
             } //VStack
             .preferredColorScheme(.dark)
         }
+        .padding(.horizontal, 15)
+        .padding(.vertical, 10)
     }
 }
 
 struct AccountView_Previews: PreviewProvider {
     static var previews: some View {
-        AccountView()
+        AccountView(user: User(), isAuthenticated: .constant(true))
             .preferredColorScheme(.dark)
     }
 }

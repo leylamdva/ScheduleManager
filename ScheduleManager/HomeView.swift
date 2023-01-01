@@ -78,6 +78,7 @@ struct HomeView: View {
             
         } //VStack
         .padding(.horizontal, 10)
+        .padding(.vertical, 10)
         .onAppear(perform: {
             for task in tasks{
                 if task.start_time < start_time {

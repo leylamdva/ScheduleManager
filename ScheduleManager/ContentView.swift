@@ -21,7 +21,7 @@ struct ContentView: View {
                 .tabItem{
                     Label("Calendar", systemImage: "calendar")
                 }
-            AccountView()
+            AccountView(user: user, isAuthenticated: $isAuthenticated)
                 .tabItem{
                     Label("Account", systemImage: "person.circle")
                 }

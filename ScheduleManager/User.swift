@@ -40,3 +40,7 @@ enum CodingKeys: CodingKey {
 struct Token : Codable {
     var token: String
 }
+
+struct Message : Codable {
+    var message: String
+}
