@@ -12,7 +12,7 @@ struct HomeView: View {
     @StateObject var locationManager = LocationManager()
     @ObservedObject var user: User
     
-    @State private var tasks = [UserTask(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.init(timeIntervalSinceNow: 120 * 60), recurring: "true", weather: "sunny", tags: []), UserTask(name: "Classes", timeSensitive: true, start_time: Date.init(timeIntervalSinceNow: 8000), end_time: Date.init(timeIntervalSinceNow: 8000 + 180 * 60), recurring: "", weather: "", tags: []), UserTask(name: "Draw", timeSensitive: false, start_time: Date.now, end_time: Date.now, recurring: "Never", weather: "None", tags: [])]
+    @State private var tasks = [UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.init(timeIntervalSinceNow: 120 * 60), repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: []), UserTask(name: "Classes", isTimeSensitive: true, startDateTime: Date.init(timeIntervalSinceNow: 8000), endDateTime: Date.init(timeIntervalSinceNow: 8000 + 180 * 60), repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), UserTask(name: "Draw", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])]
     
     @State var start_time = Date.distantFuture
     @State var end_time = Date.distantPast
@@ -27,74 +27,95 @@ struct HomeView: View {
     }
     
     var body: some View {
-        VStack{
-            // Weather
-            WeatherView(user: user, locationManager: locationManager)
-            
-            //Today's Date
-            TodayView()
-            
-            // Tasks timeline (if any)
-            ScrollView {
-                if hasTimeSensitive {
-                    let today = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date.now)) ?? Date.now
-                    ZStack {
-                        TimelineGrid(today: today, start_time: start_time, end_time: end_time)
-                        
-                        HStack {
-                            // TODO: calculate task duration
-                            // TODO: place tasks in the correct spot
-                            ForEach(tasks, id: \.self) { task in
-                                if task.timeSensitive {
-//                                    let duration = min(task.end_time.timeIntervalSince(task.start_time) / 3600,
-//                                                       end_time.timeIntervalSince(task.start_time) / 3600,
-//                                                       end_time.timeIntervalSince(start_time) / 3600)
-                                    //var position = task.start_time.timeIntervalSince(start_time) / 3600
-                                    VStack (spacing: 0) {
-                                        Spacer()
-                                            .frame(height: 14 + 32 * 0)
-                                        Text(task.name).bold()
-                                            .frame(width: 100, height: 32 * 1)
-                                        // TODO: fix color (color of first tag or default color)
-                                            .background(RoundedRectangle(cornerRadius: 7).fill(.blue))
-                                        Spacer()
+        NavigationView {
+            VStack{
+                // Weather
+                WeatherView(user: user, locationManager: locationManager)
+                
+                //Today's Date
+                TodayView()
+                
+                // Tasks timeline (if any)
+                ScrollView {
+                    if hasTimeSensitive {
+                        let today = Calendar.current.date(from: Calendar.current.dateComponents([.year, .month, .day], from: Date.now)) ?? Date.now
+                        ZStack {
+                            TimelineGrid(today: today, start_time: start_time, end_time: end_time)
+                            
+                            HStack {
+                                // TODO: calculate task duration
+                                // TODO: place tasks in the correct spot
+                                ForEach(tasks, id: \.self) { task in
+                                    if task.isTimeSensitive {
+    //                                    let duration = min(task.end_time.timeIntervalSince(task.start_time) / 3600,
+    //                                                       end_time.timeIntervalSince(task.start_time) / 3600,
+    //                                                       end_time.timeIntervalSince(start_time) / 3600)
+                                        //var position = task.start_time.timeIntervalSince(start_time) / 3600
+                                        VStack (spacing: 0) {
+                                            Spacer()
+                                                .frame(height: 14 + 32 * 0)
+                                            Text(task.name).bold()
+                                                .frame(width: 100, height: 32 * 1)
+                                            // TODO: fix color (color of first tag or default color)
+                                                .background(RoundedRectangle(cornerRadius: 7).fill(.blue))
+                                            Spacer()
+                                        }
                                     }
+                                    
                                 }
-                                
                             }
                         }
+                    } else {
+                        Text("No time-sensitive tasks for today")
+                            .fontWeight(.bold)
+                            .font(.title3)
                     }
-                } else {
-                    Text("No time-sensitive tasks for today")
-                        .fontWeight(.bold)
-                        .font(.title3)
+                    
+                    // The remaining tasks (Checklist)
+                    //TODO: Add no task available text
+                    TaskChecklist(tasks: tasks)
+                } //ScrollView
+                Spacer()
+                
+                // Plus for adding tasks
+                HStack{
+                    Spacer()
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(name: "", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
+                        ZStack {
+                            Circle()
+                                .fill(.blue)
+                                .frame(width: 65, height: 65)
+                                .padding()
+                            Image(systemName: "plus")
+                                .resizable()
+                                .frame(width: 20, height: 20)
+                        }
+                    })
+                    .buttonStyle(PlainButtonStyle())
                 }
                 
-                // The remaining tasks (Checklist)
-                //TODO: Add no task available text
-                TaskChecklist(tasks: tasks)
-            } //ScrollView
-            Spacer()
-            
-        } //VStack
+            } //VStack
+            .navigationBarBackButtonHidden(true)
+        } //Navigation view
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
         .onAppear(perform: {
             for task in tasks{
-                if task.start_time < start_time {
-                    start_time = task.start_time
+                if task.startDateTime < start_time {
+                    start_time = task.startDateTime
                     start_time = start_time.roundDown()!
                 }
                 
-                if task.end_time > end_time {
-                    end_time = task.end_time
+                if task.endDateTime > end_time {
+                    end_time = task.endDateTime
                     end_time = end_time.roundUp()!
                 }
                 
-                if task.timeSensitive {
+                if task.isTimeSensitive {
                     hasTimeSensitive = true
                 }
             }
+            print(locationManager.statusString)
         })
     }
 }
@@ -167,7 +188,7 @@ struct TaskChecklist: View {
                 .fontWeight(.bold)
                 .font(.title)
             ForEach(tasks, id: \.self) { task in
-                if !task.timeSensitive {
+                if !task.isTimeSensitive {
                     CheckboxTaskRow(task: task)
                 }
             }

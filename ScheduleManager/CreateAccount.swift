@@ -100,7 +100,7 @@ struct CreateAccount: View {
         ]
             let body = try! JSONSerialization.data(withJSONObject: bodyObject)
             
-            let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body)
+        let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body, token: "")
             print(String(decoding: data, as: UTF8.self))
             
             do {

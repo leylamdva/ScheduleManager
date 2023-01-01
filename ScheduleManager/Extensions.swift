@@ -43,6 +43,13 @@ extension DateFormatter {
     static let iso: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        formatter.timeZone  = TimeZone(secondsFromGMT: 0)
+        return formatter
+    }()
+    
+    static let iso8601: ISO8601DateFormatter = {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
         return formatter
     }()
     

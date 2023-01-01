@@ -9,11 +9,12 @@ import Foundation
 
 struct UserTask: Hashable {
     var name: String
-    var timeSensitive: Bool
-    var start_time: Date
-    var end_time: Date
-    var recurring: String
-    var weather: String
+    var isTimeSensitive: Bool
+    var startDateTime: Date
+    var endDateTime: Date
+    var repeatDays: [Bool]
+    var weatherRequirement: String
+    var isCompleted: Bool
     var tags: [Tag]
 }
 

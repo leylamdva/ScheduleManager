@@ -8,13 +8,14 @@
 import Foundation
 
 struct API {
-    func sendPostRequest(requestUrl: String, requestBodyComponents: Data) async -> (Data, Int){
+    func sendPostRequest(requestUrl: String, requestBodyComponents: Data, token: String) async -> (Data, Int){
         let url = URL(string: requestUrl)!
         var request = URLRequest(url: url)
         
         // Headers
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         request.setValue("*/*", forHTTPHeaderField: "accept")
+        request.setValue(token, forHTTPHeaderField: "Authorization")
         request.httpMethod = "POST"
         request.httpBody = requestBodyComponents
         

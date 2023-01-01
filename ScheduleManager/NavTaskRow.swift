@@ -15,16 +15,16 @@ struct NavTaskRow: View {
             Text(task.name)
             Spacer()
             // Weather icon
-            if task.weather != "" {
-                WeatherIcon(weather: task.weather)
+            if task.weatherRequirement != "" {
+                WeatherIcon(weather: task.weatherRequirement)
             }
             // Time sensitive
             //TODO: fix time check
-            if task.start_time != nil{
+            if task.isTimeSensitive {
                 Image(systemName: "clock")
             }
             //Recurring
-            if task.recurring == "true"{
+            if !task.repeatDays.isEmpty && task.repeatDays.contains(true){
                 Image(systemName: "repeat")
             }
             // Custom tags
@@ -41,7 +41,7 @@ struct NavTaskRow: View {
 
 struct NavTaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        NavTaskRow(task: UserTask(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        NavTaskRow(task: UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))]))
             .preferredColorScheme(.dark)
     }
 }

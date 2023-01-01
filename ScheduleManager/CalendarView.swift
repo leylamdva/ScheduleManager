@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct CalendarView: View {
+    @ObservedObject var user: User
     @State private var date = Date()
     @State private var tasks = [
-        UserTask(name: "Tennis", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "true", weather: "sunny", tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
-        UserTask(name: "Software Engineering Homework", timeSensitive: true, start_time: Date.now, end_time: Date.now, recurring: "false", weather: "", tags: [Tag(name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
+        UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
+        UserTask(name: "Software Engineering Homework", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "", isCompleted: false, tags: [Tag(name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
     ]
     
     var body: some View {
@@ -37,7 +38,7 @@ struct CalendarView: View {
                 // Plus icon (For adding tasks)
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(name: "", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)
@@ -60,7 +61,7 @@ struct CalendarView: View {
 
 struct CalendarView_Previews: PreviewProvider {
     static var previews: some View {
-        CalendarView()
+        CalendarView(user: User())
             .preferredColorScheme(.dark)
     }
 }
