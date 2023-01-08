@@ -23,6 +23,7 @@ struct CreateTask: View {
     @State private var showAlert = false
     @State private var showError = false
     @State private var processing = false
+    @State var addedTags: [String] = []
     
     // Custom cancel button
     var buttonCancel: some View {Button(action: {
@@ -37,6 +38,7 @@ struct CreateTask: View {
         Task {
             processing = true
             await addTask()
+            await syncTags()
         }
     }) {
         Text("Done")
@@ -130,8 +132,8 @@ struct CreateTask: View {
                         }
                     } // VStack repeat
                     
-                    // Tags
-                    NavigationLink(destination: CreateTagsView(task: task), label: {
+                    // Tags Navigation View
+                    NavigationLink(destination: CreateTagsView(task: $task, addedTags: $addedTags, token: user.token), label: {
                         HStack {
                             Text("Tags")
                                 .modifier(MenuText())
@@ -208,32 +210,61 @@ struct CreateTask: View {
             "tags" : []
         ]
         
-            // TODO: send tags as well
-        
         let body = try! JSONSerialization.data(withJSONObject: bodyObject)
             
         let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body, token: user.token)
             print(String(decoding: data, as: UTF8.self))
             
-            do {
-                if status == 200 || status == 201{
-                    processing = false
-                    showAlert = true
-                }else{
-                    let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
-                    print(decodedMessage)
-                    processing = false
-                    showError = true
-                }
-            } catch {
-                print(error)
+        do {
+            if status == 200 || status == 201{
+                //processing = false
+                //showAlert = true
+                task = try JSONDecoder().decode(UserTask.self, from: data)
+            }else{
+                let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+                print(decodedMessage)
+                processing = false
+                showError = true
             }
+        } catch {
+            print(error)
+        }
+    }
+    
+    func syncTags() async {
+        let url = RequestBase().url + "/api/Tasks/tags/" + task.id
+        
+        let bodyObject : [String: Any] = [
+            "tags" : addedTags
+        ]
+        
+        let body = try! JSONSerialization.data(withJSONObject: bodyObject)
+        print(String(decoding: body, as: UTF8.self))
+        
+        let (data, status) = await API().sendPutRequest(requestUrl: url, requestBodyComponents: body, token: user.token)
+        print(String(decoding: data, as: UTF8.self))
+        
+        do {
+            if status == 200 || status == 201{
+                processing = false
+                showAlert = true
+            }else{
+                let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+                print(decodedMessage)
+                processing = false
+                showError = true
+            }
+        } catch {
+            print(error)
+        }
     }
 }
 
+
+
 struct CreateTask_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTask(user: User(), task: UserTask(name: "", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []))
+        CreateTask(user: User(), task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []))
             .preferredColorScheme(.dark)
     }
 }

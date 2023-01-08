@@ -11,8 +11,8 @@ struct CalendarView: View {
     @ObservedObject var user: User
     @State private var date = Date()
     @State private var tasks = [
-        UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
-        UserTask(name: "Software Engineering Homework", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "", isCompleted: false, tags: [Tag(name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
+        UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
+        UserTask(id: "", name: "Software Engineering Homework", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: [Tag(id: "", name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
     ]
     
     var body: some View {
@@ -38,7 +38,7 @@ struct CalendarView: View {
                 // Plus icon (For adding tasks)
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(name: "", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)

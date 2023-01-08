@@ -78,7 +78,7 @@ struct WeatherIcon: View {
 
 struct TaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        CheckboxTaskRow(task: UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
+        CheckboxTaskRow(task: UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(id: "", name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(id: "", name: "Personal", color: SelectedColor(red: 1, green: 0, blue: 0))]))
             .preferredColorScheme(.dark)
     }
 }

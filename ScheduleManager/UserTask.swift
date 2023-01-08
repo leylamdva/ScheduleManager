@@ -7,23 +7,25 @@
 
 import Foundation
 
-struct UserTask: Hashable {
+struct UserTask: Hashable, Codable {
+    var id: String
     var name: String
     var isTimeSensitive: Bool
-    var startDateTime: Date
-    var endDateTime: Date
+    var startDateTime: String
+    var endDateTime: String
     var repeatDays: [Bool]
     var weatherRequirement: String
     var isCompleted: Bool
     var tags: [Tag]
 }
 
-struct Tag: Hashable {
+struct Tag: Hashable, Codable {
+    var id: String
     var name: String
     var color: SelectedColor
 }
 
-struct SelectedColor: Hashable {
+struct SelectedColor: Hashable, Codable {
     var red: Double
     var green: Double
     var blue: Double

@@ -11,8 +11,9 @@ import CoreLocation
 struct HomeView: View {
     @StateObject var locationManager = LocationManager()
     @ObservedObject var user: User
+    @ObservedObject var tasksViewModel = TasksViewModel()
     
-    @State private var tasks = [UserTask(name: "Tennis", isTimeSensitive: true, startDateTime: Date.now, endDateTime: Date.init(timeIntervalSinceNow: 120 * 60), repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: []), UserTask(name: "Classes", isTimeSensitive: true, startDateTime: Date.init(timeIntervalSinceNow: 8000), endDateTime: Date.init(timeIntervalSinceNow: 8000 + 180 * 60), repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), UserTask(name: "Draw", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])]
+    @State private var tasks = [UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: []), UserTask(id: "", name: "Classes", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), UserTask(id: "", name: "Draw", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])]
     
     @State var start_time = Date.distantFuture
     @State var end_time = Date.distantPast
@@ -45,7 +46,7 @@ struct HomeView: View {
                             HStack {
                                 // TODO: calculate task duration
                                 // TODO: place tasks in the correct spot
-                                ForEach(tasks, id: \.self) { task in
+                                ForEach(tasksViewModel.tasks, id: \.self) { task in
                                     if task.isTimeSensitive {
     //                                    let duration = min(task.end_time.timeIntervalSince(task.start_time) / 3600,
     //                                                       end_time.timeIntervalSince(task.start_time) / 3600,
@@ -73,14 +74,14 @@ struct HomeView: View {
                     
                     // The remaining tasks (Checklist)
                     //TODO: Add no task available text
-                    TaskChecklist(tasks: tasks)
+                    TaskChecklist(tasks: tasksViewModel.tasks)
                 } //ScrollView
                 Spacer()
                 
                 // Plus for adding tasks
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(name: "", isTimeSensitive: false, startDateTime: Date.now, endDateTime: Date.now, repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)
@@ -99,15 +100,21 @@ struct HomeView: View {
         } //Navigation view
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
-        .onAppear(perform: {
-            for task in tasks{
-                if task.startDateTime < start_time {
-                    start_time = task.startDateTime
+        .task {
+            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
+            
+            for task in tasksViewModel.tasks{
+                //print(task.startDateTime)
+                let taskStartDateTime = DateFormatter.iso.date(from: task.startDateTime) ?? Date.now
+                if taskStartDateTime != Date.now && taskStartDateTime < start_time {
+                    start_time = DateFormatter.iso.date(from: task.startDateTime)!
                     start_time = start_time.roundDown()!
                 }
                 
-                if task.endDateTime > end_time {
-                    end_time = task.endDateTime
+                //print(task.endDateTime)
+                let taskEndDateTime = DateFormatter.iso.date(from: task.endDateTime) ?? Date.now
+                if taskEndDateTime != Date.now && taskEndDateTime > end_time {
+                    end_time = DateFormatter.iso.date(from: task.endDateTime)!
                     end_time = end_time.roundUp()!
                 }
                 
@@ -115,8 +122,11 @@ struct HomeView: View {
                     hasTimeSensitive = true
                 }
             }
-            print(locationManager.statusString)
-        })
+        }
+//        .onAppear(perform: {
+//
+//            //print(locationManager.statusString)
+//        })
     }
 }
 
