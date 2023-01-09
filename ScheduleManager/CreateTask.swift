@@ -20,8 +20,8 @@ struct CreateTask: View {
     
     @State var repeatTime = "Never"
     @State var selectedDays = [false, false, false, false, false, false, false]
-    @State var start_time = Date.now
-    @State var end_time = Date.now
+    @State var start_time: Date = Date.now
+    @State var end_time: Date = Date.now
     @State private var showAlert = false
     @State private var showError = false
     @State private var processing = false

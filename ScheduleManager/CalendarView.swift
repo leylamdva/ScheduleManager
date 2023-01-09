@@ -9,17 +9,19 @@ import SwiftUI
 
 struct CalendarView: View {
     @ObservedObject var user: User
-    @State private var date = Date()
-    @State private var tasks = [
-        UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0))]),
-        UserTask(id: "", name: "Software Engineering Homework", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: [Tag(id: "", name: "Homework", color: SelectedColor(red: 1, green: 0, blue: 0))])
-    ]
+    @State private var selectedDate = Date()
+    @ObservedObject var tasksViewModel = TasksViewModel()
     
     var body: some View {
         NavigationView{
             VStack(alignment: .leading) {
-                DatePicker("Date", selection: $date, displayedComponents: [.date])
+                DatePicker("Date", selection: $selectedDate, displayedComponents: [.date])
                     .datePickerStyle(.graphical)
+                    .onChange(of: selectedDate, perform: { newValue in
+                        Task {
+                            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: selectedDate), token: user.token)
+                        }
+                    })
                 Divider()
                 //Title
                 Text("Tasks")
@@ -27,18 +29,23 @@ struct CalendarView: View {
                     .font(.title2)
                     .padding(.horizontal, 20)
                 // Tasks
-                ScrollView {
-                    ForEach(tasks, id: \.self) { task in
-                        //TODO: Destination to edit task
-                        NavigationLink(destination: Text("Another view"), label: {NavTaskRow(task: task, user: user)})
-                            .buttonStyle(PlainButtonStyle())
+                if tasksViewModel.tasks.isEmpty {
+                    Text("No tasks available for the selected day")
+                        .fontWeight(.bold)
+                        .font(.title2)
+                        .padding()
+                } else{
+                    ScrollView {
+                        ForEach(tasksViewModel.tasks, id: \.self) { task in
+                            NavTaskRow(task: task, user: user)
+                        }
                     }
                 }
                 Spacer()
                 // Plus icon (For adding tasks)
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true, start_time: selectedDate, end_time: selectedDate), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)
@@ -56,6 +63,9 @@ struct CalendarView: View {
         }
         .navigationBarBackButtonHidden(true)
         .preferredColorScheme(.dark)
+        .task {
+            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: selectedDate), token: user.token)
+        }
     }
 }
 

@@ -18,7 +18,7 @@ struct NavTaskRow: View {
                 Text(task.name)
                 Spacer()
                 // Weather icon
-                if task.weatherRequirement != "" {
+                if task.weatherRequirement != "None" {
                     WeatherIcon(weather: task.weatherRequirement)
                 }
                 // Time sensitive
