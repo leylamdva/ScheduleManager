@@ -12,37 +12,34 @@ struct NavTaskRow: View {
     @ObservedObject var user: User
     
     var body: some View {
-        NavigationView {
-            NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
-                HStack{
-                    //Name of task
-                    Text(task.name)
-                    Spacer()
-                    // Weather icon
-                    if task.weatherRequirement != "" {
-                        WeatherIcon(weather: task.weatherRequirement)
-                    }
-                    // Time sensitive
-                    if task.isTimeSensitive {
-                        Image(systemName: "clock")
-                    }
-                    //Recurring
-                    if !task.repeatDays.isEmpty && task.repeatDays.contains(true){
-                        Image(systemName: "repeat")
-                    }
-                    // Custom tags
-                    if !task.tags.isEmpty {
-                        TagsView(tags: task.tags)
-                    }
-                    //Right arrow (for nav link)
-                    Image(systemName: "chevron.right")
+        NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
+            HStack{
+                //Name of task
+                Text(task.name)
+                Spacer()
+                // Weather icon
+                if task.weatherRequirement != "" {
+                    WeatherIcon(weather: task.weatherRequirement)
                 }
-                .padding(10)
-                .padding(.horizontal, 20)
-            })
-            .buttonStyle(PlainButtonStyle())
-            
-        }
+                // Time sensitive
+                if task.isTimeSensitive {
+                    Image(systemName: "clock")
+                }
+                //Recurring
+                if !task.repeatDays.isEmpty && task.repeatDays.contains(true){
+                    Image(systemName: "repeat")
+                }
+                // Custom tags
+                if !task.tags.isEmpty {
+                    TagsView(tags: task.tags)
+                }
+                //Right arrow (for nav link)
+                Image(systemName: "chevron.right")
+            }
+            .padding(10)
+            .padding(.horizontal, 20)
+        })
+        .buttonStyle(PlainButtonStyle())
     }
 }
 

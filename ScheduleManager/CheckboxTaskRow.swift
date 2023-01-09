@@ -10,50 +10,69 @@ import SwiftUI
 struct CheckboxTaskRow: View {
     var task: UserTask
     @ObservedObject var user: User
-    @State var isCompleted: Bool = false
+    @State var isCompleted = false
     
     var body: some View {
-        NavigationView {
-            VStack {
-                HStack{
-                    // Checkmark
-                    Button{
-                        // TODO: update the database when the task is completed
-                        isCompleted.toggle()
-                    }label: {
-                        Image(systemName: isCompleted ? "checkmark.circle.fill" : "circle")
-                            .resizable()
-                            .frame(width: 20, height: 20)
+        VStack {
+            HStack{
+                // Checkmark
+                Button{
+                    // If completed, notify database
+                    Task {
+                        await toggleComplete(taskId: task.id)
                     }
-                    // Regular or crossed out text
-                    if isCompleted{
-                        NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
-                            Text(task.name)
-                                .font(.title3)
-                                .strikethrough()
-                        })
-                        .buttonStyle(PlainButtonStyle())
-                    }else{
-                        NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
-                            Text(task.name)
-                                .font(.title3)
-                        })
-                        .buttonStyle(PlainButtonStyle())
-                    }
-                    Spacer()
-                    // Weather icon
-                    if task.weatherRequirement != "None" {
-                        WeatherIcon(weather: task.weatherRequirement)
-                    }
-                    // Tags
-                    if !task.tags.isEmpty{
-                        TagsView(tags: task.tags)
-                    }
+                    isCompleted.toggle()
+                }label: {
+                    Image(systemName: (task.isCompleted && isCompleted) ? "checkmark.circle.fill" : "circle")
+                        .resizable()
+                        .frame(width: 20, height: 20)
                 }
-                .padding(5)
-                Divider()
+                // Regular or crossed out text
+                if task.isCompleted && isCompleted {
+                    NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
+                        Text(task.name)
+                            .font(.title3)
+                            .strikethrough()
+                    })
+                    .buttonStyle(PlainButtonStyle())
+                }else{
+                    NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
+                        Text(task.name)
+                            .font(.title3)
+                    })
+                    .buttonStyle(PlainButtonStyle())
+                }
+                Spacer()
+                // Weather icon
+                if task.weatherRequirement != "None" {
+                    WeatherIcon(weather: task.weatherRequirement)
+                }
+                // Tags
+                if !task.tags.isEmpty{
+                    TagsView(tags: task.tags)
+                }
             }
+            .padding(5)
+            Divider()
         } //VStack
+        .onAppear(perform: {
+            isCompleted = task.isCompleted
+        })
+    }
+    
+    func toggleComplete(taskId: String) async {
+        let url = RequestBase().url + "/api/Tasks/toggleComplete" + taskId
+        
+        let body = Data()
+        
+        let (data, status) = await API().sendPostRequest(requestUrl: url, requestBodyComponents: body, token: user.token)
+        print(String(decoding: data, as: UTF8.self))
+        
+        if status == 200 || status == 201 {
+            print("Successfully toggled")
+        } else{
+            print("An error occurred")
+        }
     }
 }
 
