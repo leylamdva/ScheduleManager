@@ -32,19 +32,20 @@ struct AccountView: View {
                         .background(Color.gray)
                         .padding(.horizontal)
                     
+                    // TODO: Implement manual location selection
                     // Location
-                    HStack {
-                        NavigationLink(destination: Text("Location View"), label: {
+                    NavigationLink(destination: Text("Location View"), label: {
+                        HStack {
                             Text("Location")
                                 .font(.title3)
-                        })
-                            .buttonStyle(PlainButtonStyle())
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                    }
+                            Spacer()
+                            Image(systemName: "chevron.right")
+                        }
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                        
                     .padding(20)
                     
-                    // TODO: Separate the modifier and stacks
                     // Clear all data
                     Button{
                         // TODO: clear data implementation
@@ -57,13 +58,12 @@ struct AccountView: View {
                     .padding(.vertical, 5)
                     
                     // Reset Password
-                    Button{
-                        // TODO: reset password implementation
-                    }label: {
+                    NavigationLink(destination: ForgotPassword(email: user.email), label: {
                         Text("Reset Password")
                             .underline()
                             .foregroundColor(.red)
-                    }
+                    })
+                    .buttonStyle(PlainButtonStyle())
                     .padding(.horizontal, 20)
                     .padding(.vertical, 5)
                     
