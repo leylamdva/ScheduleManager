@@ -13,8 +13,6 @@ struct HomeView: View {
     @ObservedObject var user: User
     @ObservedObject var tasksViewModel = TasksViewModel()
     
-    @State private var tasks = [UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "sunny", isCompleted: false, tags: []), UserTask(id: "", name: "Classes", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), UserTask(id: "", name: "Draw", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])]
-    
     @State var start_time = Date.distantFuture
     @State var end_time = Date.distantPast
     @State var hasTimeSensitive = false
@@ -74,14 +72,14 @@ struct HomeView: View {
                     
                     // The remaining tasks (Checklist)
                     //TODO: Add no task available text
-                    TaskChecklist(tasks: tasksViewModel.tasks)
+                    TaskChecklist(tasks: tasksViewModel.tasks, user: user)
                 } //ScrollView
                 Spacer()
                 
                 // Plus for adding tasks
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)
@@ -191,6 +189,7 @@ struct WeatherView: View {
 
 struct TaskChecklist: View {
     var tasks: [UserTask]
+    var user: User
     
     var body: some View {
         VStack(alignment: .leading){
@@ -199,7 +198,7 @@ struct TaskChecklist: View {
                 .font(.title)
             ForEach(tasks, id: \.self) { task in
                 if !task.isTimeSensitive {
-                    CheckboxTaskRow(task: task)
+                    CheckboxTaskRow(task: task, user: user)
                 }
             }
         }

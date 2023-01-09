@@ -15,11 +15,13 @@ struct CreateTask: View {
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @ObservedObject var user: User
+    @State var task: UserTask
+    @State var isNewTask: Bool
+    
     @State var repeatTime = "Never"
     @State var selectedDays = [false, false, false, false, false, false, false]
     @State var start_time = Date.now
     @State var end_time = Date.now
-    @State var task: UserTask
     @State private var showAlert = false
     @State private var showError = false
     @State private var processing = false
@@ -35,10 +37,14 @@ struct CreateTask: View {
     
     // Custom done button
     var buttonDone: some View {Button(action: {
-        Task {
-            processing = true
-            await addTask()
-            await syncTags()
+        if isNewTask {
+            Task {
+                processing = true
+                await addTask()
+                await syncTags()
+            }
+        } else {
+            //TODO: update the task in the database
         }
     }) {
         Text("Done")
@@ -170,6 +176,7 @@ struct CreateTask: View {
             } //ZStack
 
         }
+        .padding(.horizontal, 15)
         .navigationBarBackButtonHidden(true)
         // TODO: Custom Cancel and Done button
         .navigationTitle("Create a Task")
@@ -260,11 +267,9 @@ struct CreateTask: View {
     }
 }
 
-
-
 struct CreateTask_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTask(user: User(), task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []))
+        CreateTask(user: User(), task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), isNewTask: false)
             .preferredColorScheme(.dark)
     }
 }

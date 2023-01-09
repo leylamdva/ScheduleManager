@@ -30,7 +30,7 @@ struct CalendarView: View {
                 ScrollView {
                     ForEach(tasks, id: \.self) { task in
                         //TODO: Destination to edit task
-                        NavigationLink(destination: Text("Another view"), label: {NavTaskRow(task: task)})
+                        NavigationLink(destination: Text("Another view"), label: {NavTaskRow(task: task, user: user)})
                             .buttonStyle(PlainButtonStyle())
                     }
                 }
@@ -38,7 +38,7 @@ struct CalendarView: View {
                 // Plus icon (For adding tasks)
                 HStack{
                     Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), label: {
+                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true), label: {
                         ZStack {
                             Circle()
                                 .fill(.blue)
