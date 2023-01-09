@@ -51,12 +51,12 @@ struct HomeView: View {
     //                                                       end_time.timeIntervalSince(start_time) / 3600)
                                         //var position = task.start_time.timeIntervalSince(start_time) / 3600
                                         VStack (spacing: 0) {
+                                            let backgroundColor = task.tags.isEmpty ? .blue : Color(red: task.tags[0].color.red, green: task.tags[0].color.green, blue: task.tags[0].color.blue)
                                             Spacer()
                                                 .frame(height: 14 + 32 * 0)
                                             Text(task.name).bold()
                                                 .frame(width: 100, height: 32 * 1)
-                                            // TODO: fix color (color of first tag or default color)
-                                                .background(RoundedRectangle(cornerRadius: 7).fill(.blue))
+                                                .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColor))
                                             Spacer()
                                         }
                                     }
@@ -71,7 +71,6 @@ struct HomeView: View {
                     }
                     
                     // The remaining tasks (Checklist)
-                    //TODO: Add no task available text
                     TaskChecklist(tasks: tasksViewModel.tasks, user: user)
                 } //ScrollView
                 Spacer()
@@ -120,11 +119,30 @@ struct HomeView: View {
                     hasTimeSensitive = true
                 }
             }
+        } //task
+        .refreshable {
+            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
+            
+            for task in tasksViewModel.tasks{
+                //print(task.startDateTime)
+                let taskStartDateTime = DateFormatter.iso.date(from: task.startDateTime) ?? Date.now
+                if taskStartDateTime != Date.now && taskStartDateTime < start_time {
+                    start_time = DateFormatter.iso.date(from: task.startDateTime)!
+                    start_time = start_time.roundDown()!
+                }
+                
+                //print(task.endDateTime)
+                let taskEndDateTime = DateFormatter.iso.date(from: task.endDateTime) ?? Date.now
+                if taskEndDateTime != Date.now && taskEndDateTime > end_time {
+                    end_time = DateFormatter.iso.date(from: task.endDateTime)!
+                    end_time = end_time.roundUp()!
+                }
+                
+                if task.isTimeSensitive {
+                    hasTimeSensitive = true
+                }
+            }
         }
-//        .onAppear(perform: {
-//
-//            //print(locationManager.statusString)
-//        })
     }
 }
 

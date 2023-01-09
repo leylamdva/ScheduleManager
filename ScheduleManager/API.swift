@@ -64,4 +64,23 @@ struct API {
         }
         return (Data(), 0)
     }
+    
+    func sendDeleteRequest(requestUrl: String, requestBodyComponents: Data, token: String) async -> (Data, Int) {
+        let url = URL(string: requestUrl)!
+        var request = URLRequest(url: url)
+        
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue("*/*", forHTTPHeaderField: "accept")
+        request.httpMethod = "DELETE"
+        request.setValue(token, forHTTPHeaderField: "Authorization")
+        request.httpBody = requestBodyComponents
+        
+        do{
+            let (data, response) = try await URLSession.shared.data(for: request)
+            return (data, (response as? HTTPURLResponse)?.statusCode ?? 0)
+        } catch {
+            print(error)
+        }
+        return (Data(), 0)
+    }
 }

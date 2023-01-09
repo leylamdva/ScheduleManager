@@ -26,6 +26,7 @@ struct CreateTask: View {
     @State private var showError = false
     @State private var processing = false
     @State var addedTags: [String] = []
+    @State var changedTags = false
     
     // Custom cancel button
     var buttonCancel: some View {Button(action: {
@@ -38,13 +39,16 @@ struct CreateTask: View {
     // Custom done button
     var buttonDone: some View {Button(action: {
         if isNewTask {
+            processing = true
             Task {
-                processing = true
                 await addTask()
                 await syncTags()
             }
         } else {
-            //TODO: update the task in the database
+            processing = true
+            Task {
+                await updateTask()
+            }
         }
     }) {
         Text("Done")
@@ -139,7 +143,7 @@ struct CreateTask: View {
                     } // VStack repeat
                     
                     // Tags Navigation View
-                    NavigationLink(destination: CreateTagsView(task: $task, addedTags: $addedTags, token: user.token), label: {
+                    NavigationLink(destination: CreateTagsView(task: $task, addedTags: $addedTags, changedTags: $changedTags, token: user.token), label: {
                         HStack {
                             Text("Tags")
                                 .modifier(MenuText())
@@ -178,9 +182,17 @@ struct CreateTask: View {
         }
         .padding(.horizontal, 15)
         .navigationBarBackButtonHidden(true)
-        // TODO: Custom Cancel and Done button
         .navigationTitle("Create a Task")
         .navigationBarItems(leading: buttonCancel, trailing: buttonDone)
+        .onAppear(perform: {
+            // If tags exist, add them to the array
+            if !isNewTask && !changedTags{
+                addedTags = []
+                for tag in task.tags {
+                    addedTags.append(tag.id)
+                }
+            }
+        })
         .alert("Success", isPresented: $showAlert){
             Button("Done", role: .cancel){ self.presentationMode.wrappedValue.dismiss() }
         } message: {
@@ -206,7 +218,6 @@ struct CreateTask: View {
         }
         
         //print(DateFormatter.iso8601.string(from: start_time))
-        
         let bodyObject : [String: Any] = [
             "name" : task.name,
             "isTimeSensitive" : task.isTimeSensitive,
@@ -251,6 +262,51 @@ struct CreateTask: View {
         let (data, status) = await API().sendPutRequest(requestUrl: url, requestBodyComponents: body, token: user.token)
         print(String(decoding: data, as: UTF8.self))
         
+        do {
+            if status == 200 || status == 201{
+                processing = false
+                showAlert = true
+            }else{
+                let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
+                print(decodedMessage)
+                processing = false
+                showError = true
+            }
+        } catch {
+            print(error)
+        }
+    }
+    
+    func updateTask() async {
+        let url = RequestBase().url + "/api/Tasks/" + task.id
+        
+        // Prepare array of days for posting request
+        if repeatTime != "Custom" {
+            selectedDays = setDays(option: repeatTime)
+        }
+        
+        if task.name == "" {
+            task.name = "Unnamed Task"
+        }
+        
+        //print(DateFormatter.iso8601.string(from: start_time))
+        //print(addedTags)
+        let bodyObject : [String: Any] = [
+            "name" : task.name,
+            "isTimeSensitive" : task.isTimeSensitive,
+            "startDateTime" : DateFormatter.iso8601.string(from: start_time),
+            "endDateTime" : DateFormatter.iso8601.string(from: end_time),
+            "repeatDays" : selectedDays,
+            "weatherRequirement" : task.weatherRequirement,
+            "isCompleted" : task.isCompleted,
+            "tags" : addedTags
+        ]
+        
+        let body = try! JSONSerialization.data(withJSONObject: bodyObject)
+            
+        let (data, status) = await API().sendPutRequest(requestUrl: url, requestBodyComponents: body, token: user.token)
+        print(String(decoding: data, as: UTF8.self))
+            
         do {
             if status == 200 || status == 201{
                 processing = false

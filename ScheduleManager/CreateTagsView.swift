@@ -10,6 +10,7 @@ import SwiftUI
 struct CreateTagsView: View {
     @Binding var task: UserTask
     @Binding var addedTags: [String]
+    @Binding var changedTags: Bool
     var token: String
     
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
@@ -29,12 +30,13 @@ struct CreateTagsView: View {
                     
                 } else {
                     ForEach(task.tags, id:\.self) {tag in
-                        TagRow(tag: tag)
+                        TagRow(tag: tag, token: token, task: $task, addedTags: $addedTags)
                     }
                 }
                 
                 // Add New Tags
                 Button(action: {
+                    changedTags = true
                     addTag = true
                 }){
                     Text("Create a tag")
@@ -59,13 +61,6 @@ struct CreateTagsView: View {
         } message: {
             Text("An error occurred while creating the tag")
         }
-//        .onAppear(perform: {
-//            if !task.tags.isEmpty {
-//                for tag in task.tags {
-//                    addedTags.append(tag.id)
-//                }
-//            }
-//        })
         .sheet(isPresented: $addTag){
             ZStack {
                 if processing {
@@ -146,9 +141,12 @@ struct CreateTagsView: View {
 
 struct TagRow: View{
     var tag: Tag
+    var token: String
+    @Binding var task: UserTask
+    @Binding var addedTags: [String]
+    
     @State var description = false
     @State var tagColor = Color.blue
-    @State var selectedColor = Color.yellow
     @State var tagName = ""
     
     var body: some View{
@@ -168,6 +166,30 @@ struct TagRow: View{
                         .padding(5)
                         .background(RoundedRectangle(cornerRadius: 7).fill(tagColor))
                     Spacer()
+                    // Delete tag button
+                    Button(action: {
+                        for i in 0..<task.tags.count {
+                            if task.tags[i].id == tag.id {
+                                print("Deleting tag \(task.tags[i].name)")
+                                task.tags.remove(at: i)
+                            }
+                        }
+                        
+                        for j in 0..<addedTags.count {
+                            if addedTags[j] == tag.id {
+                                print("Deleting tag \(addedTags[j]) from addedTags")
+                                addedTags.remove(at: j)
+                            }
+                        }
+//                        Task {
+//                            await deleteTag(id: tag.id, token: token)
+//                        }
+                    }, label: {
+                        Image(systemName: "x.circle.fill")
+                            .resizable()
+                            .frame(width: 25, height: 25)
+                            .foregroundColor(.white)
+                    })
                 }
                 .padding(.horizontal, 10)
             }
@@ -182,12 +204,18 @@ struct TagRow: View{
                         .frame(width: 30, height: 30)
                     TextField("", text: $tagName)
                         .keyboardType(.default)
-                    ColorPicker("", selection: $selectedColor, supportsOpacity: false)
-                        .onChange(of: selectedColor, perform: { newValue in
-                            tagColor = selectedColor
-                            // TODO: send edit request
+                        .onChange(of: tagName, perform: {newValue in
+                            Task {
+                                await editTag(id: tag.id, newColor: tagColor, newName: tagName, token: token)
+                            }
                         })
-                    //Spacer()
+                    ColorPicker("", selection: $tagColor, supportsOpacity: false)
+                        .onChange(of: tagColor, perform: { newValue in
+                            Task {
+                                await editTag(id: tag.id, newColor: tagColor, newName: tagName, token: token)
+                            }
+                        })
+
                 }
             }
             
@@ -199,19 +227,39 @@ struct TagRow: View{
         .onAppear(perform: {
             tagColor = Color(red: tag.color.red, green: tag.color.green, blue: tag.color.blue)
             tagName = tag.name
-            //TODO: Send edit request on color change or name change
         })
     }
     
 }
 
-func editTag(id: String, newColor: Color, newName: String) async {
+func editTag(id: String, newColor: Color, newName: String, token: String) async {
+    let url = RequestBase().url + "/api/Tags/" + id
     
+    let bodyObject : [String: Any] = [
+        "name" : newName,
+        "color" : [
+            "red" : newColor.components.red,
+            "green" : newColor.components.green,
+            "blue" : newColor.components.blue
+        ]
+    ]
+    
+    let body = try! JSONSerialization.data(withJSONObject: bodyObject)
+    
+    let (data, status) = await API().sendPutRequest(requestUrl: url, requestBodyComponents: body, token: token)
+    print(String(decoding: data, as: UTF8.self))
+
+    print("Status code: \(status)")
+    if status == 200 || status == 201{
+        print("Success updating the tag")
+    }else{
+        print("An error occurred updating the tag")
+    }
 }
 
 struct CreateTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTagsView(task: .constant(UserTask(id: "", name: "Example", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "none", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(id: "", name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))])), addedTags: .constant([]), token: "")
+        CreateTagsView(task: .constant(UserTask(id: "", name: "Example", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "none", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(id: "", name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))])), addedTags: .constant([]), changedTags: .constant(false), token: "")
             .preferredColorScheme(.dark)
     }
 }
