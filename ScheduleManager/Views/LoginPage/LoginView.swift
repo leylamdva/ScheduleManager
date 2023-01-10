@@ -7,10 +7,6 @@
 
 import SwiftUI
 
-struct RequestBase {
-    var url: String = "https://schedules.azurewebsites.net"
-}
-
 struct LoginView: View {
     let fieldColor = Color(red: 0.168, green: 0.168, blue: 0.208)
     
@@ -18,56 +14,66 @@ struct LoginView: View {
     @Binding var authenticated: Bool
     @Binding var userData: Data
     @State private var showAlert = false
+    @State private var processing = false
     
     var body: some View {
         NavigationView{
-            VStack{
-                // Email field
-                TextField("Email", text: $user.email)
-                    .modifier(InputField(fieldColor: fieldColor))
-                    .keyboardType(.emailAddress)
-                
-                // Password field
-                VStack(alignment: .leading) {
-                    SecureField("Password", text: $user.password)
+            ZStack {
+                VStack{
+                    // Email field
+                    TextField("Email", text: $user.email)
                         .modifier(InputField(fieldColor: fieldColor))
-                    .keyboardType(.default)
+                        .keyboardType(.emailAddress)
                     
-                    NavigationLink(destination: ForgotPassword(email: user.email)){
-                        Text("Forgot password?")
-                            .padding(.horizontal, 10)
-                            .foregroundColor(.white)
+                    // Password field
+                    VStack(alignment: .leading) {
+                        SecureField("Password", text: $user.password)
+                            .modifier(InputField(fieldColor: fieldColor))
+                        .keyboardType(.default)
+                        
+                        NavigationLink(destination: ForgotPassword(email: user.email)){
+                            Text("Forgot password?")
+                                .padding(.horizontal, 10)
+                                .foregroundColor(.white)
+                                .underline()
+                        }
+                    }
+                    
+                    // Login button
+                    NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated){
+                        Button(action: {
+                            Task{
+                                processing = true
+                                await onLoginPressed()
+                                processing = false
+                            }
+                        }){
+                            Text("Login")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: 200)
+                                .background(.blue)
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                        }
+                    }
+                    
+                    // Create account
+                    NavigationLink(destination: CreateAccount(authenticated: $authenticated, userData: $userData)){
+                        Text("or Create an Account")
+                            .foregroundColor(.blue)
                             .underline()
                     }
+                    
+                    Spacer()
+                    
+                    
                 }
                 
-                // Login button
-                NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated){
-                    Button(action: {
-                        Task{
-                            await onLoginPressed()
-                        }
-                    }){
-                        Text("Login")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .padding()
-                            .frame(maxWidth: 200)
-                            .background(.blue)
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
-                    }
+                if processing {
+                    ProgressView()
                 }
-                
-                // Create account
-                NavigationLink(destination: CreateAccount(authenticated: $authenticated, userData: $userData)){
-                    Text("or Create an Account")
-                        .foregroundColor(.blue)
-                        .underline()
-                }
-                
-                Spacer()
-                
                 
             }
             .navigationBarTitle("Login", displayMode: .inline)

@@ -43,22 +43,7 @@ struct CalendarView: View {
                 }
                 Spacer()
                 // Plus icon (For adding tasks)
-                HStack{
-                    Spacer()
-                    NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true, start_time: selectedDate, end_time: selectedDate), label: {
-                        ZStack {
-                            Circle()
-                                .fill(.blue)
-                                .frame(width: 65, height: 65)
-                                .padding()
-                            Image(systemName: "plus")
-                                .resizable()
-                                .frame(width: 20, height: 20)
-                        }
-                    })
-                    .buttonStyle(PlainButtonStyle())
-                }
-                //Text("Picked date: \(date.formatted(date: .abbreviated, time: .omitted))")
+                AddTaskButtonView(user: user, startTime: selectedDate, endTime: selectedDate)
             }
         }
         .navigationBarBackButtonHidden(true)

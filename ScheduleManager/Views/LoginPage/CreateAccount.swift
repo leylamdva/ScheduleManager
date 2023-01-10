@@ -16,58 +16,67 @@ struct CreateAccount: View {
     @State private var showAlert = false
     @State private var alertType = ""
     @State var repeatedPassword = ""
+    @State var processing = false
     
     var body: some View {
         NavigationView{
-            VStack{
-                TextField("Email", text: $user.email)
-                    .modifier(InputField(fieldColor: fieldColor))
-                    .keyboardType(.emailAddress)
-                
-                SecureField("Password", text: $user.password)
-                    .modifier(InputField(fieldColor: fieldColor))
-                    .keyboardType(.default)
-                
-                SecureField("Verify password", text: $repeatedPassword)
-                    .modifier(InputField(fieldColor: fieldColor))
-                    .keyboardType(.default)
+            ZStack {
+                VStack{
+                    TextField("Email", text: $user.email)
+                        .modifier(InputField(fieldColor: fieldColor))
+                        .keyboardType(.emailAddress)
                     
-                // Warning if passwords do not match
-                if repeatedPassword != "" && user.password != repeatedPassword {
-                    Text("Passwords do not match")
-                        .foregroundColor(.red)
-                }
-                
-                // Submit button
-                NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated) {
+                    SecureField("Password", text: $user.password)
+                        .modifier(InputField(fieldColor: fieldColor))
+                        .keyboardType(.default)
                     
-                    Button(action: {
-                       // TODO: Implement POST registration request (only if passwords match)
-                        if user.email == "" || user.password == "" || repeatedPassword == "" {
-                            alertType = "blank"
-                            showAlert = true
-                        } else if repeatedPassword != user.password {
-                            alertType = "match"
-                            showAlert = true
-                        } else {
-                            Task{
-                                await onSubmitPressed()
-                            }
-                        }
+                    SecureField("Verify password", text: $repeatedPassword)
+                        .modifier(InputField(fieldColor: fieldColor))
+                        .keyboardType(.default)
                         
-                    }){
-                        Text("Submit")
-                            .font(.title3)
-                            .fontWeight(.bold)
-                            .padding()
-                            .frame(maxWidth: 200)
-                            .background(.blue)
-                            .foregroundColor(.white)
-                            .clipShape(Capsule())
+                    // Warning if passwords do not match
+                    if repeatedPassword != "" && user.password != repeatedPassword {
+                        Text("Passwords do not match")
+                            .foregroundColor(.red)
                     }
+                    
+                    // Submit button
+                    NavigationLink(destination: ContentView(user: user, isAuthenticated: $authenticated), isActive: $authenticated) {
+                        
+                        Button(action: {
+                            if user.email == "" || user.password == "" || repeatedPassword == "" {
+                                alertType = "blank"
+                                showAlert = true
+                            } else if repeatedPassword != user.password {
+                                alertType = "match"
+                                showAlert = true
+                            } else {
+                                Task{
+                                    processing = true
+                                    await onSubmitPressed()
+                                    processing = false
+                                }
+                            }
+                            
+                        }){
+                            Text("Submit")
+                                .font(.title3)
+                                .fontWeight(.bold)
+                                .padding()
+                                .frame(maxWidth: 200)
+                                .background(.blue)
+                                .foregroundColor(.white)
+                                .clipShape(Capsule())
+                        }
+                    }
+                    
+                    Spacer()
+                    
                 }
                 
-                Spacer()
+                if processing {
+                    ProgressView()
+                }
                 
             }
             .navigationTitle("Create an Account")

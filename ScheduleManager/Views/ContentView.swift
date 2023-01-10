@@ -11,10 +11,11 @@ struct ContentView: View {
     @ObservedObject var user: User
     @Binding var isAuthenticated: Bool
     @ObservedObject var tasksViewModel = TasksViewModel()
+    @ObservedObject var weatherViewModel = WeatherViewModel()
     
     var body: some View {
         TabView{
-            HomeView(user: user, tasksViewModel: tasksViewModel)
+            HomeView(user: user, tasksViewModel: tasksViewModel, weatherViewModel: weatherViewModel)
                 .tabItem{
                     Label("Home", systemImage: "house")
                 }
