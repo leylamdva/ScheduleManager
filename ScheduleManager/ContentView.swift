@@ -10,10 +10,11 @@ import SwiftUI
 struct ContentView: View {
     @ObservedObject var user: User
     @Binding var isAuthenticated: Bool
+    @ObservedObject var tasksViewModel = TasksViewModel()
     
     var body: some View {
         TabView{
-            HomeView(user: user)
+            HomeView(user: user, tasksViewModel: tasksViewModel)
                 .tabItem{
                     Label("Home", systemImage: "house")
                 }

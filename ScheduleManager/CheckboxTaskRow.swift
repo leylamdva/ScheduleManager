@@ -89,6 +89,7 @@ struct TagsView: View {
 
 struct WeatherIcon: View {
     var weather: String
+    
     var body: some View {
         switch weather{
         case "Clear":

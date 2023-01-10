@@ -48,7 +48,7 @@ struct CreateTagsView: View {
                 
                 Spacer()
             }
-            .padding(.horizontal, 15)
+            //.padding(.horizontal, 15)
             .preferredColorScheme(.dark)
         }
         .alert("Success", isPresented: $showSuccess){

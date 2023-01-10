@@ -7,15 +7,18 @@
 
 import SwiftUI
 import CoreLocation
+import Foundation
 
 struct HomeView: View {
     @StateObject var locationManager = LocationManager()
     @ObservedObject var user: User
-    @ObservedObject var tasksViewModel = TasksViewModel()
+    @ObservedObject var tasksViewModel: TasksViewModel
     
     @State var start_time = Date.distantFuture
     @State var end_time = Date.distantPast
     @State var hasTimeSensitive = false
+    @State var weatherResponse = WeatherResponse(weather: "", temp: 0.00)
+    @State var cityName = CityName(name: "", country: "")
     
     var userLatitude: String {
             return "\(locationManager.lastLocation?.coordinate.latitude ?? 0)"
@@ -29,7 +32,7 @@ struct HomeView: View {
         NavigationView {
             VStack{
                 // Weather
-                WeatherView(user: user, locationManager: locationManager)
+                WeatherView(user: user, locationManager: locationManager, weatherResponse: weatherResponse, cityName: cityName)
                 
                 //Today's Date
                 TodayView()
@@ -50,15 +53,18 @@ struct HomeView: View {
     //                                                       end_time.timeIntervalSince(task.start_time) / 3600,
     //                                                       end_time.timeIntervalSince(start_time) / 3600)
                                         //var position = task.start_time.timeIntervalSince(start_time) / 3600
-                                        VStack (spacing: 0) {
-                                            let backgroundColor = task.tags.isEmpty ? .blue : Color(red: task.tags[0].color.red, green: task.tags[0].color.green, blue: task.tags[0].color.blue)
-                                            Spacer()
-                                                .frame(height: 14 + 32 * 0)
-                                            Text(task.name).bold()
-                                                .frame(width: 100, height: 32 * 1)
-                                                .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColor))
-                                            Spacer()
-                                        }
+                                        NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
+                                            VStack (spacing: 0) {
+                                                let backgroundColor = task.tags.isEmpty ? .blue : Color(red: task.tags[0].color.red, green: task.tags[0].color.green, blue: task.tags[0].color.blue)
+                                                Spacer()
+                                                    .frame(height: 14 + 32 * 0)
+                                                Text(task.name).bold()
+                                                    .frame(width: 100, height: 32 * 1)
+                                                    .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColor))
+                                                Spacer()
+                                            }
+                                        })
+                                        .buttonStyle(PlainButtonStyle())
                                     }
                                     
                                 }
@@ -98,57 +104,102 @@ struct HomeView: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 10)
         .task {
-            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
-            
-            for task in tasksViewModel.tasks{
-                //print(task.startDateTime)
-                let taskStartDateTime = DateFormatter.iso.date(from: task.startDateTime) ?? Date.now
-                if taskStartDateTime != Date.now && taskStartDateTime < start_time {
-                    start_time = DateFormatter.iso.date(from: task.startDateTime)!
-                    start_time = start_time.roundDown()!
-                }
-                
-                //print(task.endDateTime)
-                let taskEndDateTime = DateFormatter.iso.date(from: task.endDateTime) ?? Date.now
-                if taskEndDateTime != Date.now && taskEndDateTime > end_time {
-                    end_time = DateFormatter.iso.date(from: task.endDateTime)!
-                    end_time = end_time.roundUp()!
-                }
-                
-                if task.isTimeSensitive {
-                    hasTimeSensitive = true
-                }
-            }
+            await setUp()
         } //task
         .refreshable {
-            await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
-            
-            for task in tasksViewModel.tasks{
-                //print(task.startDateTime)
-                let taskStartDateTime = DateFormatter.iso.date(from: task.startDateTime) ?? Date.now
-                if taskStartDateTime != Date.now && taskStartDateTime < start_time {
-                    start_time = DateFormatter.iso.date(from: task.startDateTime)!
-                    start_time = start_time.roundDown()!
-                }
-                
-                //print(task.endDateTime)
-                let taskEndDateTime = DateFormatter.iso.date(from: task.endDateTime) ?? Date.now
-                if taskEndDateTime != Date.now && taskEndDateTime > end_time {
-                    end_time = DateFormatter.iso.date(from: task.endDateTime)!
-                    end_time = end_time.roundUp()!
-                }
-                
-                if task.isTimeSensitive {
-                    hasTimeSensitive = true
-                }
+            await setUp()
+        }
+    }
+    
+    func setUp() async {
+        
+        // Tasks Setup
+        await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
+        
+        for task in tasksViewModel.tasks{
+            //print(task.startDateTime)
+            let taskStartDateTime = DateFormatter.iso.date(from: task.startDateTime) ?? Date.now
+            if taskStartDateTime != Date.now && taskStartDateTime < start_time {
+                start_time = DateFormatter.iso.date(from: task.startDateTime)!
+                start_time = start_time.roundDown()!
             }
+            
+            //print(task.endDateTime)
+            let taskEndDateTime = DateFormatter.iso.date(from: task.endDateTime) ?? Date.now
+            if taskEndDateTime != Date.now && taskEndDateTime > end_time {
+                end_time = DateFormatter.iso.date(from: task.endDateTime)!
+                end_time = end_time.roundUp()!
+            }
+            
+            if task.isTimeSensitive {
+                hasTimeSensitive = true
+            }
+        } //for loop
+        
+        //Weather Setup
+        //If location is allowed
+        if (locationManager.statusString == "authorizedWhenInUse" || locationManager.statusString == "authorizedAlways") {
+            
+            await getWeatherCoord()
+            
+            if (user.location == "") {
+                await getLocationName()
+            }
+            
+        }
+          
+    }
+    
+    func getWeatherCoord() async {
+        let url = RequestBase().url + "/Weather/coords?lat=\(locationManager.lastLocation?.coordinate.latitude ?? 0)&lon=\(locationManager.lastLocation?.coordinate.longitude ?? 0)"
+        
+        //print(url)
+        
+        let (data, status) = await API().sendGetRequest(requestUrl: url, token: user.token)
+        print(String(decoding: data, as: UTF8.self))
+        //print("Code: \(status)")
+        
+        if !data.isEmpty && status == 200{
+            do {
+                weatherResponse = try JSONDecoder().decode(WeatherResponse.self, from: data)
+                weatherResponse.temp = round(convertTemperature(temp: weatherResponse.temp, from: .kelvin, to: .celsius))
+            }catch {
+                print(error)
+            }
+        } else {
+            print("An error occurred")
+        }
+    }
+    
+    func getLocationName() async {
+        let url = RequestBase().url + "/Weather/city_name?lat=\(locationManager.lastLocation?.coordinate.latitude ?? 0)&lon=\(locationManager.lastLocation?.coordinate.longitude ?? 0)"
+        
+        let (data, status) = await API().sendGetRequest(requestUrl: url, token: user.token)
+        print(String(decoding: data, as: UTF8.self))
+        
+        print("Code: \(status)")
+        if !data.isEmpty && status == 200{
+            do {
+                cityName = try JSONDecoder().decode(CityName.self, from: data)
+                user.location = cityName.name
+            }catch {
+                print(error)
+            }
+        } else {
+            print("An error occurred")
         }
     }
 }
 
+func convertTemperature(temp: Double, from inputTempType: UnitTemperature, to outputTempType: UnitTemperature) -> Double {
+    let input = Measurement(value: temp, unit: inputTempType)
+    let output = input.converted(to: outputTempType)
+    return output.value
+}
+
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
-        HomeView(user: User())
+        HomeView(user: User(), tasksViewModel: TasksViewModel())
             .preferredColorScheme(.dark)
     }
 }
@@ -173,6 +224,8 @@ struct TimeLineView: View {
 struct WeatherView: View {
     var user: User
     var locationManager: LocationManager
+    var weatherResponse: WeatherResponse
+    var cityName: CityName
     
     var body: some View {
         ZStack{
@@ -184,13 +237,18 @@ struct WeatherView: View {
             if (locationManager.statusString == "authorizedWhenInUse" || locationManager.statusString == "authorizedAlways" || user.location != "") {
                 HStack {
                     Image(systemName: "location")
-                    // TODO: Get city name
-                    Text("\(user.location)")
+                    if user.location != "" {
+                        Text("\(user.location)")
+                            .font(.title3)
+                    } else {
+                        Text("\(cityName.name)")
+                            .font(.title3)
+                    }
                     Spacer()
-                    // TODO: send request and display weather
-                    Text("25")
-                    // TODO: Function to display the right icon
-                    Image(systemName: "sun.max")
+                    let tempString = String(format: "%.0f", weatherResponse.temp)
+                    Text("\(tempString)°C")
+                        .font(.title3)
+                    WeatherIcon(weather: weatherResponse.weather)
                 }
                 .padding()
             } else {
