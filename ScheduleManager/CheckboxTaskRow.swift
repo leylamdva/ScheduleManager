@@ -94,7 +94,7 @@ struct WeatherIcon: View {
         switch weather{
         case "Clear":
             Image(systemName: "sun.max")
-        case "Rain":
+        case "Rainy":
             Image(systemName: "cloud.rain")
         case "Cloudy":
             Image(systemName: "cloud")

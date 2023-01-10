@@ -17,6 +17,7 @@ struct HomeView: View {
     @State var start_time = Date.distantFuture
     @State var end_time = Date.distantPast
     @State var hasTimeSensitive = false
+    @State var hasNonTimeSensitive = false
     @State var weatherResponse = WeatherResponse(weather: "", temp: 0.00)
     @State var cityName = CityName(name: "", country: "")
     
@@ -77,7 +78,14 @@ struct HomeView: View {
                     }
                     
                     // The remaining tasks (Checklist)
-                    TaskChecklist(tasks: tasksViewModel.tasks, user: user)
+                    if hasNonTimeSensitive {
+                        TaskChecklist(tasks: tasksViewModel.tasks, user: user)
+                    } else {
+                        Text("No other tasks for the day")
+                            .fontWeight(.bold)
+                            .font(.title3)
+                    }
+                    
                 } //ScrollView
                 Spacer()
                 
@@ -133,6 +141,8 @@ struct HomeView: View {
             
             if task.isTimeSensitive {
                 hasTimeSensitive = true
+            } else {
+                hasNonTimeSensitive = true
             }
         } //for loop
         
@@ -267,16 +277,77 @@ struct TaskChecklist: View {
     var tasks: [UserTask]
     var user: User
     
+    @State var showDropDown = false
+    @State var selectedTag = ""
+    
     var body: some View {
         VStack(alignment: .leading){
-            Text("Other")
-                .fontWeight(.bold)
-                .font(.title)
-            ForEach(tasks, id: \.self) { task in
-                if !task.isTimeSensitive {
-                    CheckboxTaskRow(task: task, user: user)
+            HStack {
+                Text("Other")
+                    .fontWeight(.bold)
+                    .font(.title)
+                Spacer()
+                Button(action: {
+                    showDropDown.toggle()
+                }, label: {
+                    Image(systemName: "line.3.horizontal.decrease.circle")
+                    Text("Filter")
+                        .font(.title2)
+                })
+                .buttonStyle(PlainButtonStyle())
+                .padding(.horizontal, 10)
+            }
+            
+            // List of tags
+            if showDropDown {
+                HStack {
+                    Spacer()
+                    VStack {
+                        ForEach(tasks, id: \.self) { task in
+                            if !task.isTimeSensitive {
+                                TagsButtonView(tags: task.tags, selectedTag: $selectedTag)
+                            }
+                        }
+                    }
+                    .padding(10)
+                    .background(RoundedRectangle(cornerRadius: 15).fill(.gray))
                 }
             }
+            
+            // List of tasks
+            ForEach(tasks, id: \.self) { task in
+                if !task.isTimeSensitive && selectedTag == "" {
+                    CheckboxTaskRow(task: task, user: user)
+                } else {
+                    ForEach(task.tags, id: \.self) { tag in
+                        if selectedTag == tag.name {
+                            CheckboxTaskRow(task: task, user: user)
+                        }
+                    }
+                }
+            }
+        } // VStack
+    }
+}
+
+struct TagsButtonView: View {
+    var tags: [Tag]
+    @Binding var selectedTag: String
+    
+    var body: some View {
+        ForEach(tags, id: \.self) { tag in
+            Button(action: {
+                if selectedTag == tag.name {
+                    selectedTag = ""
+                }else {
+                    selectedTag = tag.name
+                }  
+            }, label: {
+                Text(tag.name).bold()
+                    .padding(5)
+                    .background(RoundedRectangle(cornerRadius: 7).fill(Color(red: tag.color.red, green: tag.color.green, blue: tag.color.blue)))
+            })
+            .buttonStyle(PlainButtonStyle())
         }
     }
 }
