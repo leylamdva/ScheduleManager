@@ -23,6 +23,8 @@ struct TagsButtonView: View {
                 Text(tag.name).bold()
                     .padding(5)
                     .background(RoundedRectangle(cornerRadius: 7).fill(Color(red: tag.color.red, green: tag.color.green, blue: tag.color.blue)))
+                    .border((selectedTag == tag.name) ? .black : Color(red: tag.color.red, green: tag.color.green, blue: tag.color.blue))
+                    
             })
             .buttonStyle(PlainButtonStyle())
         }
