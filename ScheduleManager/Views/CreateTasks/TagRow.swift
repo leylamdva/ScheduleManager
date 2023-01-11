@@ -80,7 +80,7 @@ struct TagRow: View{
 
 struct TagRow_Previews: PreviewProvider {
     static var previews: some View {
-        TagRow(tag: Tag(id: "", name: "ExampleTag", color: SelectedColor(red: 1, green: 0, blue: 0)), token: "", task: .constant(UserTask(id: "", name: "ExampleTask", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), addedTags: .constant([]))
+        TagRow(tag: Tag(id: "", name: "ExampleTag", color: SelectedColor(red: 1, green: 0, blue: 0)), token: "", task: .constant(UserTask(id: "", name: "ExampleTask", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [], duration: 0, hourOffset: 0)), addedTags: .constant([]))
             .preferredColorScheme(.dark)
     }
 }

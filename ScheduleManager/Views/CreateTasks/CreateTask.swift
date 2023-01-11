@@ -119,6 +119,13 @@ struct CreateTask: View {
                     addedTags.append(tag.id)
                 }
             }
+            
+            if !isNewTask {
+                let taskStartTime = ($task).startDateTime
+                let taskEndTime = ($task).endDateTime
+                start_time = DateFormatter.iso.date(from: taskStartTime.wrappedValue) ?? Date.now
+                end_time = DateFormatter.iso.date(from: taskEndTime.wrappedValue) ?? Date.now
+            }
         })
         .alert("Success", isPresented: $showAlert){
             Button("Done", role: .cancel){ self.presentationMode.wrappedValue.dismiss() }
@@ -252,7 +259,7 @@ struct CreateTask: View {
 
 struct CreateTask_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTask(user: User(), task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: []), isNewTask: false)
+        CreateTask(user: User(), task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "", isCompleted: false, tags: [], duration: 0, hourOffset: 0), isNewTask: false)
             .preferredColorScheme(.dark)
     }
 }

@@ -49,17 +49,15 @@ struct HomeView: View {
                             HStack {
                                 ForEach(tasksViewModel.tasks, id: \.self) { task in
                                     if task.isTimeSensitive {
-//                                        let duration = getDuration(taskStartTime: task.start_time, taskEndTime: task.end_time, startTime: start_time, endTime: end_time)
-                                        
-                                        //let position: Int = getPosition(taskStartTime: task.start_time, startTime: start_time)
+                                        let offset = max(task.hourOffset - Double(start_time.hour), 0)
                                         
                                         NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
                                             VStack (spacing: 0) {
                                                 let backgroundColor: Color = task.tags.isEmpty ? .blue : Color(red: task.tags[0].color.red, green: task.tags[0].color.green, blue: task.tags[0].color.blue)
                                                 Spacer()
-                                                    .frame(height: 14 + 32 * 0)
+                                                    .frame(height: 14 + 32 * offset)
                                                 Text(task.name).bold()
-                                                    .frame(width: 100, height: 32 * 1)
+                                                    .frame(width: 100, height: 32 * (task.duration + 3))
                                                     .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColor))
                                                 Spacer()
                                             }

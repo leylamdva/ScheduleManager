@@ -7,20 +7,6 @@
 
 import Foundation
 
-
-func getDuration(taskStartTime: Date, taskEndTime: Date, startTime: Date, endTime: Date) -> Double {
-    let actualDuration = taskEndTime.timeIntervalSince(taskStartTime) / 3600
-    let startSinceEnd = endTime.timeIntervalSince(taskStartTime) / 3600
-    let startEnd = endTime.timeIntervalSince(startTime) / 3600
-    return min(actualDuration, startSinceEnd, startEnd)
-}
-
-func getPosition(taskStartTime: Date, startTime: Date) -> Double {
-    let intervalSeconds = taskStartTime.distance(to: startTime)
-    let result: Double = intervalSeconds / 3600
-    return result
-}
-
 func convertTemperature(temp: Double, from inputTempType: UnitTemperature, to outputTempType: UnitTemperature) -> Double {
     let input = Measurement(value: temp, unit: inputTempType)
     let output = input.converted(to: outputTempType)

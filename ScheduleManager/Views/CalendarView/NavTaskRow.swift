@@ -45,7 +45,7 @@ struct NavTaskRow: View {
 
 struct NavTaskRow_Previews: PreviewProvider {
     static var previews: some View {
-        NavTaskRow(task: UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "Clear", isCompleted: false, tags: [Tag(id: "", name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))]), user: User())
+        NavTaskRow(task: UserTask(id: "", name: "Tennis", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "Clear", isCompleted: false, tags: [Tag(id: "", name: "sports", color: SelectedColor(red: 1, green: 0, blue: 0))], duration: 0, hourOffset: 0), user: User())
             .preferredColorScheme(.dark)
     }
 }

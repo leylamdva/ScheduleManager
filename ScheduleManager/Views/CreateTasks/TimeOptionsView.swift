@@ -59,7 +59,7 @@ struct TimeOptionsView: View {
 
 struct TimeOptionsView_Previews: PreviewProvider {
     static var previews: some View {
-        TimeOptionsView(task: .constant(UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [])), start_time: .constant(Date.now), end_time: .constant(Date.now), fieldColor: .gray)
+        TimeOptionsView(task: .constant(UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [], duration: 0, hourOffset: 0)), start_time: .constant(Date.now), end_time: .constant(Date.now), fieldColor: .gray)
             .preferredColorScheme(.dark)
     }
 }

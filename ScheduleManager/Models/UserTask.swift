@@ -17,6 +17,8 @@ struct UserTask: Hashable, Codable {
     var weatherRequirement: String
     var isCompleted: Bool
     var tags: [Tag]
+    var duration: Double
+    var hourOffset: Double
 }
 
 struct Tag: Hashable, Codable {

@@ -166,7 +166,7 @@ func editTag(id: String, newColor: Color, newName: String, token: String) async 
 
 struct CreateTagsView_Previews: PreviewProvider {
     static var previews: some View {
-        CreateTagsView(task: .constant(UserTask(id: "", name: "Example", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "none", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(id: "", name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))])), addedTags: .constant([]), changedTags: .constant(false), token: "")
+        CreateTagsView(task: .constant(UserTask(id: "", name: "Example", isTimeSensitive: true, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "none", isCompleted: false, tags: [Tag(id: "", name: "Sports", color: SelectedColor(red: 1, green: 0, blue: 0)), Tag(id: "", name: "Personal", color: SelectedColor(red: 0, green: 0, blue: 1))], duration: 0, hourOffset: 0)), addedTags: .constant([]), changedTags: .constant(false), token: "")
             .preferredColorScheme(.dark)
     }
 }

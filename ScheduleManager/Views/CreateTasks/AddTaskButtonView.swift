@@ -15,7 +15,7 @@ struct AddTaskButtonView: View {
     var body: some View {
         HStack{
             Spacer()
-            NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: []), isNewTask: true, start_time: startTime, end_time: endTime), label: {
+            NavigationLink(destination: CreateTask(user: user, task: UserTask(id: "", name: "", isTimeSensitive: false, startDateTime: "", endDateTime: "", repeatDays: [], weatherRequirement: "None", isCompleted: false, tags: [], duration: 0, hourOffset: 0), isNewTask: true, start_time: startTime, end_time: endTime), label: {
                 ZStack {
                     Circle()
                         .fill(.blue)

@@ -78,6 +78,7 @@ struct LoginView: View {
             }
             .navigationBarTitle("Login", displayMode: .inline)
         }
+        .preferredColorScheme(.dark)
         .padding(.horizontal, 15)
         .alert("Error", isPresented: $showAlert){
             Button("Close", role: .cancel){ }
