@@ -21,6 +21,7 @@ struct CreateTagsView: View {
     @State var processing = false
     @State var showSuccess = false
     @State var showError = false
+    @State var existingTags: [Tag] = []
     
     var body: some View {
         NavigationView{
@@ -61,6 +62,23 @@ struct CreateTagsView: View {
         } message: {
             Text("An error occurred while creating the tag")
         }
+        .task {
+            // Load existing tags
+            let url = RequestBase().url + "/api/Tags"
+            
+            let (data, status) = await API().sendGetRequest(requestUrl: url, token: token)
+            print(String(decoding: data, as: UTF8.self))
+            
+            if !data.isEmpty && status == 200{
+                do {
+                    existingTags = try JSONDecoder().decode([Tag].self, from: data)
+                }catch {
+                    print(error)
+                }
+            } else {
+                print("An error occurred")
+            }
+        }
         .sheet(isPresented: $addTag){
             ZStack {
                 if processing {
@@ -86,9 +104,9 @@ struct CreateTagsView: View {
                         addTag.toggle()
                     }){
                         // Dismiss arrow
-                        Image(systemName: "chevron.down")
-                            .resizable()
-                            .frame(width: 40, height: 25)
+                        Text("Done")
+                            .font(.title2)
+                            .padding(10)
                     }
                     Spacer()
                     // Text field for name and color picker for new tag
@@ -98,8 +116,27 @@ struct CreateTagsView: View {
                         ColorPicker("", selection: $newColor, supportsOpacity: false)
                     }
                     
+                    //Existing Tags
+                    if !existingTags.isEmpty {
+                        Text("Or select from existing tags: ")
+                        HStack {
+                            ForEach(existingTags, id: \.self){ tag in
+                                Button(action: {
+                                    task.tags.append(tag)
+                                    addedTags.append(tag.id)
+                                    addTag.toggle()
+                                }, label: {
+                                    Text(tag.name).bold()
+                                        .padding(5)
+                                        .background(RoundedRectangle(cornerRadius: 7).fill(Color(red: tag.color.red, green: tag.color.green, blue: tag.color.blue)))
+                                })
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        } //HStack
+                    }
+
                     Spacer()
-                }
+                } //VStack
             }
         }
     }
@@ -131,7 +168,9 @@ struct CreateTagsView: View {
             }else{
                 newTag = try JSONDecoder().decode(Tag.self, from: data)
                 processing = false
-                showError = true
+                if status != 201 {
+                    showError = true
+                }
             }
         } catch {
             print(error)
