@@ -21,7 +21,7 @@ struct AccountView: View {
                             .resizable()
                             .frame(width: 60, height: 60)
                         Spacer()
-                        Text("ExampleEmail/@gmail.com")
+                        Text(user.email)
                             .foregroundColor(.white)
                             .fontWeight(.bold)
                             .font(.title3)
