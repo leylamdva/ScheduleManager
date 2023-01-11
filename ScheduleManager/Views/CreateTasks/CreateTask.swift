@@ -42,7 +42,10 @@ struct CreateTask: View {
             processing = true
             Task {
                 await addTask()
-                await syncTags()
+                
+                if !addedTags.isEmpty {
+                    await syncTags()
+                }
             }
         } else {
             processing = true
@@ -98,6 +101,25 @@ struct CreateTask: View {
                     .modifier(FieldBackgroundView(fieldColor: fieldColor))
                     
                     Spacer()
+                    
+                    if !isNewTask {
+                        HStack {
+                            Spacer()
+                            Button(action: {
+                                Task {
+                                    await deleteTask(token: user.token, id: task.id)
+                                    self.presentationMode.wrappedValue.dismiss()
+                                }
+                            }, label: {
+                                Text("Delete Task")
+                                    .font(.title3)
+                                    .foregroundColor(.red)
+                                    .underline()
+                            })
+                            Spacer()
+                        }
+                    }
+                    
                 }//VStack
                 
                 if processing {
@@ -130,7 +152,7 @@ struct CreateTask: View {
         .alert("Success", isPresented: $showAlert){
             Button("Done", role: .cancel){ self.presentationMode.wrappedValue.dismiss() }
         } message: {
-            Text("The task has been successfully added")
+            Text("The task has been successfully added/edited")
         }
         .alert("Error", isPresented: $showError) {
             Button("Ok", role: .cancel){}
@@ -169,8 +191,10 @@ struct CreateTask: View {
             
         do {
             if status == 200 || status == 201{
-                //processing = false
-                //showAlert = true
+                if addedTags.isEmpty {
+                    processing = false
+                    showAlert = true
+                }
                 task = try JSONDecoder().decode(UserTask.self, from: data)
             }else{
                 let decodedMessage = try JSONDecoder().decode(Message.self, from: data)
@@ -254,6 +278,21 @@ struct CreateTask: View {
         } catch {
             print(error)
         }
+    }
+}
+
+func deleteTask(token: String, id: String) async {
+    let url = RequestBase().url + "/api/Tasks/" + id
+    
+    let body = Data()
+    
+    let (data, status) = await API().sendDeleteRequest(requestUrl: url, requestBodyComponents: body, token: token)
+    print(String(decoding: data, as: UTF8.self))
+    
+    if status == 200 {
+        print("Successfully deleted the task")
+    } else {
+        print("An error occurred")
     }
 }
 

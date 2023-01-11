@@ -23,6 +23,13 @@ struct CreateTagsView: View {
     @State var showError = false
     @State var existingTags: [Tag] = []
     
+    let columns = [
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible()),
+            GridItem(.flexible())
+        ]
+    
     var body: some View {
         NavigationView{
             VStack{
@@ -86,18 +93,20 @@ struct CreateTagsView: View {
                 }
                 VStack {
                     Button(action: {
-                        newTag.color.red = newColor.components.red
-                        newTag.color.green = newColor.components.green
-                        newTag.color.blue = newColor.components.blue
-                        
-                        Task {
-                            processing = true
-                            await addTag(tag: newTag)
+                        if newTag.name != "" {
+                            newTag.color.red = newColor.components.red
+                            newTag.color.green = newColor.components.green
+                            newTag.color.blue = newColor.components.blue
                             
-                            // Add the new tag to the task array
-                            task.tags.append(newTag)
-                            if newTag.id != "" {
-                                addedTags.append(newTag.id)
+                            Task {
+                                processing = true
+                                await addTag(tag: newTag)
+                                
+                                // Add the new tag to the task array
+                                task.tags.append(newTag)
+                                if newTag.id != "" {
+                                    addedTags.append(newTag.id)
+                                }
                             }
                         }
                         
@@ -119,7 +128,7 @@ struct CreateTagsView: View {
                     //Existing Tags
                     if !existingTags.isEmpty {
                         Text("Or select from existing tags: ")
-                        HStack {
+                        LazyVGrid(columns: columns) {
                             ForEach(existingTags, id: \.self){ tag in
                                 Button(action: {
                                     task.tags.append(tag)

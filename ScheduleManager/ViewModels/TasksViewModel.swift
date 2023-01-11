@@ -19,7 +19,7 @@ class TasksViewModel : ObservableObject {
         if !data.isEmpty && status == 200{
             decodeResponse(data: data)
         } else {
-            print("An error occurred")
+            print("An error occurred loading tasks")
         }
     }
     

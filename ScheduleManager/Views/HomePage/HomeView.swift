@@ -49,7 +49,7 @@ struct HomeView: View {
                             HStack {
                                 ForEach(tasksViewModel.tasks, id: \.self) { task in
                                     if task.isTimeSensitive {
-                                        let offset = max(task.hourOffset - Double(start_time.hour), 0)
+                                        let offset = max(task.hourOffset + 3 - Double(start_time.hour), 0)
                                         
                                         NavigationLink(destination: CreateTask(user: user, task: task, isNewTask: false), label: {
                                             VStack (spacing: 0) {
@@ -57,7 +57,7 @@ struct HomeView: View {
                                                 Spacer()
                                                     .frame(height: 14 + 32 * offset)
                                                 Text(task.name).bold()
-                                                    .frame(width: 100, height: 32 * (task.duration + 3))
+                                                    .frame(width: 100, height: 32 * task.duration)
                                                     .background(RoundedRectangle(cornerRadius: 7).fill(backgroundColor))
                                                 Spacer()
                                             }
@@ -104,6 +104,7 @@ struct HomeView: View {
     
     func setUp() async {
         
+        hasTimeSensitive = false
         // Tasks Setup
         await tasksViewModel.sendQuery(date: DateFormatter.iso8601.string(from: Date.now), token: user.token)
         
